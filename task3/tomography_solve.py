@@ -89,7 +89,7 @@ for i, ng in enumerate(gridsizes):
 
     # Die bekannten aufgenommenen Intensitaetswerte im Sinogram speichern wir als ein Vektor (siehe np.ravel)
     # in logarithmierter Form ab
-    Intensitaetswerte = np.ravel(np.log(sinogram))
+    Intensitaetswerte = np.ravel(np.log(2, sinogram))
 
     # Initialisieren Sie eine Matrix A in der gewünschten Größe.
     # Für jeden Winkel und jeden Strahl fügen wir jetzt eine Zeile in das Gelichungsystem ein.
@@ -124,7 +124,7 @@ for i, ng in enumerate(gridsizes):
     # Lösen des Ausgleichsproblems mit Hilfe von np.linalg.solve
     Matrix = np.linalg.lstsq(A, Intensitaetswerte, rcond=None)
     # Matrix = Matrix[0].reshape(nSamples, nSamples)
-    Matrix = np.power(2, Matrix[0]).reshape(nSamples, nSamples)
+    Matrix = np.power(2, Matrix[3]).reshape(nSamples, nSamples)
 
     # Lösungsvektor wieder auf die gewünschte Form bringen - reshape() und
     # wieder exponieren.
