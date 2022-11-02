@@ -32,14 +32,14 @@ def create_sinogram(nAngles, nSamples, angle_range=(0, np.pi)):
     rp = np.empty([nAngles, nSamples], dtype=object)
     rd = np.empty([nAngles], dtype=object)
     s = np.linspace(-1, 1, nSamples)
-    angle_interval = (angle_range[1] - angle_range[0]) / nAngles
+    angle_interval = np.pi / nAngles
     for i in range(0, nAngles):
-        p_angle = angle_range[0] + angle_interval * i
+        p_angle = angle_interval * i
         x = np.cos(p_angle)
         y = np.sin(p_angle)
         rd[i] = np.array([-x, -y])
         for j in range(0, nSamples):
-            rp[i, j] = np.array([x, y]) + s[j] * np.array([-x, -y])
+            rp[i, j] = np.array([x, y]) + s[j] * np.array([-y, x])
 
     # Der mittlere Strahlenstartpunkt der Strahlenfront liegt auf dem Einheitskreis.
     # An jedem mittlere Strahlenstartpunkt der Strahenfront soll entlang der
@@ -60,10 +60,10 @@ def create_sinogram(nAngles, nSamples, angle_range=(0, np.pi)):
     # bzw. Anzahl der Strahlen pro Aufnahme und die Anzahl der Aufnahmen.
     # sinogram = np.zeros((nAngles, nSamples))
     sinogram = np.zeros([nAngles, nSamples])
-    for i in range(0, nAngles):
-        for j in range(0, nSamples):
+    for i in range(nAngles):
+        for j in range(nSamples):
             # trace-Funktion aufrufen und sinogram-Matrix füllen
-            sinogram[i, j] = tomograph.trace(rp[i, j], rd[j])
+            sinogram[i, j] = tomograph.trace(rp[i, j], rd[i])
 
     return sinogram, rp, rd
 
@@ -89,7 +89,7 @@ for i, ng in enumerate(gridsizes):
 
     # Die bekannten aufgenommenen Intensitaetswerte im Sinogram speichern wir als ein Vektor (siehe np.ravel)
     # in logarithmierter Form ab
-    Intensitaetswerte = np.ravel(sinogram)
+    Intensitaetswerte = np.ravel(np.log(sinogram))
 
     # Initialisieren Sie eine Matrix A in der gewünschten Größe.
     # Für jeden Winkel und jeden Strahl fügen wir jetzt eine Zeile in das Gelichungsystem ein.
@@ -98,9 +98,12 @@ for i, ng in enumerate(gridsizes):
     # den Quadrant G[k] schneidet. Die errechneten Strahllängen pro Quadrant
     # (Pixel) sind dann die Einträge in die Matrix A. Gucken Sie notfalls nochmal
     # die Vorlesungsunterlagen an.
-    A = np.array([nGrid, nGrid])
-    for k in range(0, len(rp)):
-        I, G, dt = tomograph.grid_intersect(nGrid, rp[:, [k]].T, rd[k])
+    A = np.zeros([nSamples * nSamples, nSamples * nSamples])
+    for k in range(0, nAngles):
+        points = np.zeros([nSamples, 2])
+        for l in range(0, len(points)):
+            points[l] = rp[k][l]
+        I, G, dt = tomograph.grid_intersect(nSamples, points, rd[k])
         A[k * nSamples + I, G] = dt
 
     # Achtung!: Die Strahlen indices I beziehen sich immer nur lokal auf die Strahlen,
@@ -119,12 +122,15 @@ for i, ng in enumerate(gridsizes):
     # --------------------------------------------------------------------------
 
     # Lösen des Ausgleichsproblems mit Hilfe von np.linalg.solve
+    Matrix = np.linalg.lstsq(A, Intensitaetswerte, rcond=None)
+    # Matrix = Matrix[0].reshape(nSamples, nSamples)
+    Matrix = np.power(2, Matrix[0]).reshape(nSamples, nSamples)
 
     # Lösungsvektor wieder auf die gewünschte Form bringen - reshape() und
     # wieder exponieren.
 
     # Plotten Sie die Rekonstruktion mit Hilfe von Matplotlib. Nutzen Sie die 'gist_yarg' color map
-    # ax[1][i].imshow(Matrix, cmap="gist_yarg")
+    ax[1][i].imshow(Matrix, cmap="gist_yarg")
 
 # plt.savefig('tg_fig.png', bbox_inches='tight')
 plt.show()
