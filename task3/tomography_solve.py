@@ -71,7 +71,7 @@ def create_sinogram(nAngles, nSamples, angle_range=(0, np.pi)):
 # ---------------------------------------------
 # Main Programablauf:
 # ---------------------------------------------
-gridsizes = [32, 64]  # , 128, 256]
+gridsizes = [16, 32]  # , 128, 256]
 # plot mit unterfigures
 fig, ax = plt.subplots(nrows=2, ncols=len(gridsizes))
 # Für alle Gridsizes:
@@ -124,13 +124,14 @@ for i, ng in enumerate(gridsizes):
     # Lösen des Ausgleichsproblems mit Hilfe von np.linalg.solve
     Matrix = np.linalg.lstsq(A, Intensitaetswerte, rcond=None)
     # Matrix = Matrix[0].reshape(nSamples, nSamples)
-    Matrix = np.power(2, Matrix[3]).reshape(nSamples, nSamples)
+    Matrix = np.power(2, Matrix[0]).reshape(nSamples, nSamples)
 
     # Lösungsvektor wieder auf die gewünschte Form bringen - reshape() und
     # wieder exponieren.
 
     # Plotten Sie die Rekonstruktion mit Hilfe von Matplotlib. Nutzen Sie die 'gist_yarg' color map
     ax[1][i].imshow(Matrix, cmap="gist_yarg")
+    plt.show()
 
 # plt.savefig('tg_fig.png', bbox_inches='tight')
 plt.show()

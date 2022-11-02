@@ -78,7 +78,3 @@ plt.show()
 # im vergleich zur vorherigen Methode
 
 
-L = np.matrix('1 1 0 0; 0 0 1 1; 1 0 1 0; 0 1 0 1')
-b = np.matrix('-1; -5; -2; -4')
-Matrix = np.linalg.lstsq(L, b, rcond=None)
-print(np.power(2, Matrix[0]).reshape(2,2))
