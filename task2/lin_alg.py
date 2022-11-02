@@ -9,7 +9,8 @@ b = np.array([1.5, 1.5])
 alpha = math.degrees(math.acos(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))))
 print(alpha)
 
-# (b) Gegeben ist die quadratische regulaere Matrix A und ein Ergbnisvektor b. Rechnen Sie unter Nutzung der Inversen die Loesung x des Gleichungssystems Ax = b aus.
+# (b) Gegeben ist die quadratische regulaere Matrix A und ein Ergbnisvektor b.
+# Rechnen Sie unter Nutzung der Inversen die Loesung x des Gleichungssystems Ax = b aus.
 # YOUR CODE HERE
 mA = np.array([[2, 3, 4], [3, -2, -1], [5, 4, 3]])
 vB = np.array([1.4, 1.2, 1.4])
@@ -25,6 +26,10 @@ print(mA.dot(x))
 
 def matmult(M1, M2):
     # YOUR CODE HERE
+    if len(M1[0]) != len(M2):
+        print("cant multiplay two matrices with differing column and line count!")
+        print("M1 has {0:2d} columns and M2 has {1:2d} lines.".format(len(M1[0]), len(M2)))
+        return
     res = np.empty(M1.shape)
     n = 0
     for a1 in M1:
