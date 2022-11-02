@@ -101,6 +101,7 @@ for i, ng in enumerate(gridsizes):
     A = np.array([nGrid, nGrid])
     for k in range(0, len(rp)):
         I, G, dt = tomograph.grid_intersect(nGrid, rp[:, [k]].T, rd[k])
+        A[k * nSamples + I, G] = dt
 
     # Achtung!: Die Strahlen indices I beziehen sich immer nur lokal auf die Strahlen,
     # die an grid_intersect übergeben wurden um den richtigen Index in der Matrix
@@ -110,7 +111,6 @@ for i, ng in enumerate(gridsizes):
     # Das ist das gleiche wie:
     # for k in range(len(I)):
     #   A[i*nSamples+I[k], G[k]] = dt[k]
-    # A[i * nSamples + I, G] = dt
 
     # --------------------------------------------------------------------------
     # Bis hier hin kommt ihr mit der ersten Vorlesung!
