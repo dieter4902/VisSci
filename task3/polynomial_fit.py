@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import gc
+import matplotlib.lines as mlines
 
 # Laden der gegebenen Daten d0 - d4
 
@@ -33,18 +33,30 @@ def f(x_cord, a):
 
 # Lösen Sie das lineare Ausgleichsproblem
 # Hinweis: Nutzen Sie bitte hier nicht np.linalg.lstsq!, sondern implementieren sie A^T A x = A^T b selbst
+x = np.linspace(-2, 2, 200)
+file = open('output.txt', 'w')
+file.flush()
 for i in range(5):
     b = np.load("data/d{}.npy".format(i)).reshape(200)
+    color_legend = []
+    for k in range(20):
+        color_legend.append(
+            mlines.Line2D([], [], color=plt.rcParams['axes.prop_cycle'].by_key()['color'][k % 10], marker='s', ls='',
+                          label=k + 1))
+
+    plt.plot(x, b, 'r.')
     for j in range(1, 21):
-        x = np.linspace(-2, 2, 200)
+        plt.legend(handles=color_legend)
         A = create_matrix(x, j)
         AtA = A.T.dot(A)
         Atb = A.T.dot(b)
         d = np.linalg.solve(AtA, Atb)
-        plt.plot(x, b, 'r.')
-        plt.plot(x, f(x, d), 'b-')
-        plt.title("{}, {}".format(i, j))
-        plt.show()
+        error = np.sum(np.absolute(f(x, d) - b))
+        plt.plot(x, f(x, d), '-')
+        file.write("dataset no:{}, polynomial no:{}, error:{}, polynomial:\n{}\n".format(i, j, error, np.poly1d(d)))
+    plt.title("dataset n°{}".format(i))
+    plt.show()
+file.close()
 # Stellen Sie die Funktion mit Hilfe der ermittelten Koeffizienten mit matplotlib
 # np.poly1d
 # A = np.array([[1, 1], [2, 1], [3, 1], [4, 1]])
