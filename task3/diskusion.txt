@@ -1,0 +1,20 @@
+Beim ersten datensatz vermindert sich die fehlerquote von ~41 um ~2 auf ~39 das ist eine reduzierung von 5%,
+je nachdem ob man eine verbesserung von 5% lohnenswert einstuft denke ich, dass es sinn macht mehr grad zu nehmen.
+
+Beim zweiten datensatz ist die situation etwas anders die fehlerquote beim ersten versuch liebt bei ~189 springt danach runter auf ~40.3 und vermindert sich danach nur sehr wenig(der letzte versuch bringt die fehlerrate auf ~38.9)
+in anbetracht dessen würde ich sagen, dass es sich lohnt zwei grade zu nehmen, da danach die verbesserung nur marginal ist
+
+Beim dritten liegt die felhequote zerst bei ~1476, fällt dann auf ~707 und dann auf ~419,
+wonach es immer weniger sinkt und schließlich bei ~368 ankommt.
+Der unterschied zum zweiten datensatz ist hierbei, dass das rauschen sichtbar viel stärker ist,
+weshalb die fehlerrate auch beim dritten durchlauf deutlich sinkt
+
+Der vierte  Datensatz verhält ähnlich zum dritten, bloß, dass das rauschen verstärkt um x=0 herum liegt
+und deswegen auch nach 5 iterationen immernoch vergleichsweise bessere ergebnisse hervorkommen im vergleich zu den vorherigen
+
+Bei dem fünften Datensatz liegt die fehlerrate bei den ersten beiden und bei den 3,4 und 5,6 relativ nah beieinander,
+aber dazwischen sinkt die fehllerrate deutlich, nach dem siebten durchlauf aber gibt es wieder nur marginale verbesserungen
+
+Zusammenfassend würde ich sagen, beim ersten datensatz je nach anwendung bestimmt werden sollte wieviel grad man wählt,
+wohingegen bei den anderen beziehungsweise 2, 3(oder 4),5 und 7 genommen werden sollten,
+da danach die fehlerreduzierung nur noch marginal in meinen Augen erscheint.
