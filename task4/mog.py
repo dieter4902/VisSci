@@ -62,16 +62,18 @@ def magnitude_of_gradients(RGB_img):
     # 3.1.2 Definieren Sie den x-Sobel Kernel und y-Sobel Kernel.
     x_Sobel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
     y_Sobel = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-
-    # 3.1.3 TODO: Nutzen Sie sie convolution2D Funktion um die Gradienten in x- und y-Richtung zu berechnen.
+    # 3.1.3 Nutzen Sie sie convolution2D Funktion um die Gradienten in x- und y-Richtung zu berechnen.
+    x_gradient = convolution2D(gray, x_Sobel)
+    y_gradient = convolution2D(gray, y_Sobel)
 
     # 3.1.4 TODO: Nutzen Sie die zwei resultierenden Gradienten um die gesammt Gradientenlängen an jedem Pixel auszurechnen.
-
-    # Diese if Abfrage (if __name__ == '__main__':) sorgt dafür, dass der Code nur
-    # ausgeführt wird, wenn die Datei (mog.py) per python/jupyter ausgeführt wird ($ python mog.py).
-    # Solltet Ihr die Datei per "import mog" in einem anderen Script einbinden, wird dieser Code übersprungen.
+    # return np.sqrt(x_gradient * x_gradient, y_gradient * y_gradient)
+    return np.hypot(x_gradient, y_gradient)
 
 
+# Diese if Abfrage (if __name__ == '__main__':) sorgt dafür, dass der Code nur
+# ausgeführt wird, wenn die Datei (mog.py) per python/jupyter ausgeführt wird ($ python mog.py).
+# Solltet Ihr die Datei per "import mog" in einem anderen Script einbinden, wird dieser Code übersprungen.
 if __name__ == '__main__':
     # Bild laden und zu float konvertieren
     img = mpimage.imread('bilder/tower.jpg')
@@ -83,38 +85,28 @@ if __name__ == '__main__':
     # Aufgabe 1.
     # 1.1 Implementieren Sie die convolution2D Funktion (oben)
 
+    kernels = [["xsobel", np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])],
+               ["ysobel", np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])],
+               ["blur kernel", np.array([[1 / 16, 1 / 8, 1 / 16], [1 / 8, 1 / 4, 1 / 8], [1 / 16, 1 / 8, 1 / 16]])],
+               ["sharpen kernel", np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])],
+               ["identity", np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])]
+               ]
+
     # Aufgabe 2.
     # 2.1 Definieren Sie mindestens 5 verschiedene Kernels (darunter sollten beide Sobel sein) und testen Sie sie auf dem grayscale Bild indem Sie convolution2D aufrufen.
-    # 2.2 TODO: Speichern Sie alle Resultate als Bilder (sehe Tipp 2). Es sollten 5 Bilder sein.
+    # 2.2 Speichern Sie alle Resultate als Bilder (sehe Tipp 2). Es sollten 5 Bilder sein.
     # xsobel
-    kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-    plt.imshow(convolution2D(gray, kernel), cmap='gray')
-    plt.title("xsobel")
-    plt.show()
-    # ysobel
-    kernel = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-    plt.imshow(convolution2D(gray, kernel), cmap='gray')
-    plt.title("ysobel")
-    plt.show()
-    # blur kernel
-    kernel = np.array([[1 / 16, 1 / 8, 1 / 16], [1 / 8, 1 / 4, 1 / 8], [1 / 16, 1 / 8, 1 / 16]])
-    plt.imshow(convolution2D(gray, kernel), cmap='gray')
-    plt.title("blur kernel")
-    plt.show()
-    # sharpen kernel
-    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-    plt.imshow(convolution2D(gray, kernel), cmap='gray')
-    plt.title("sharpen kernel")
-    plt.show()
-    # identity
-    kernel = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
-    plt.imshow(convolution2D(gray, kernel), cmap='gray')
-    plt.title("identity")
-    plt.show()
+
+    for kernel in kernels:
+        gen_img = convolution2D(gray, kernel[1])
+        # show_image(gen_img)
+        mpimage.imsave("img/{}.png".format(kernel[0]), gen_img, cmap="gray")
 
     # Aufgabe 3:
     # 3.1 TODO: Implementieren Sie die magnitude_of_gradients Funktion (oben) und testen Sie sie mit dem RGB Bild.
     # 3.2 TODO: Speichern Sie das Resultat als Bild (sehe Tipp 2).
+
+    mpimage.imsave("magnitude.png", magnitude_of_gradients(img), cmap="gray")
 
     # ------------------------------------------------
     # Nützliche Funktionen:
