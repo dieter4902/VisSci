@@ -34,8 +34,8 @@ def convolution2D(img, kernel):
 
     # 1.1.2 Implementieren Sie die Faltung.
 
-    for r in range(padding_x, x - padding_x):  # bei 1 und nicht 0 anfangen wegen padding
-        for c in range(padding_y, y - padding_y):
+    for r in range(padding_x, x - (k_x - padding_x)):  # bei 1 und nicht 0 anfangen wegen padding
+        for c in range(padding_y, y - (k_y - padding_y)):
             new_img[r, c] = np.sum(
                 kernel * padded_img[r - padding_x: r + k_x - padding_x, c - padding_y:c + k_y - padding_y])
     # Achtung: die Faltung (convolution) soll mit beliebig großen Kernels funktionieren.
@@ -66,8 +66,8 @@ def magnitude_of_gradients(RGB_img):
     x_gradient = convolution2D(gray, x_Sobel)
     y_gradient = convolution2D(gray, y_Sobel)
 
-    # 3.1.4 TODO: Nutzen Sie die zwei resultierenden Gradienten um die gesammt Gradientenlängen an jedem Pixel auszurechnen.
-    # return np.sqrt(x_gradient * x_gradient, y_gradient * y_gradient)
+    # 3.1.4 Nutzen Sie die zwei resultierenden Gradienten um die gesammt Gradientenlängen an jedem Pixel auszurechnen.
+    # return np.sqrt(x_gradient ** 2, y_gradient ** 2)
     return np.hypot(x_gradient, y_gradient)
 
 
@@ -95,16 +95,14 @@ if __name__ == '__main__':
     # Aufgabe 2.
     # 2.1 Definieren Sie mindestens 5 verschiedene Kernels (darunter sollten beide Sobel sein) und testen Sie sie auf dem grayscale Bild indem Sie convolution2D aufrufen.
     # 2.2 Speichern Sie alle Resultate als Bilder (sehe Tipp 2). Es sollten 5 Bilder sein.
-    # xsobel
 
-    for kernel in kernels:
-        gen_img = convolution2D(gray, kernel[1])
-        # show_image(gen_img)
-        mpimage.imsave("img/{}.png".format(kernel[0]), gen_img, cmap="gray")
+    # for kernel in kernels:
+    # gen_img = convolution2D(gray, kernel[1])
+    # mpimage.imsave("img/{}.png".format(kernel[0]), gen_img, cmap="gray")
 
     # Aufgabe 3:
-    # 3.1 TODO: Implementieren Sie die magnitude_of_gradients Funktion (oben) und testen Sie sie mit dem RGB Bild.
-    # 3.2 TODO: Speichern Sie das Resultat als Bild (sehe Tipp 2).
+    # 3.1 Implementieren Sie die magnitude_of_gradients Funktion (oben) und testen Sie sie mit dem RGB Bild.
+    # 3.2 Speichern Sie das Resultat als Bild (sehe Tipp 2).
 
     mpimage.imsave("magnitude.png", magnitude_of_gradients(img), cmap="gray")
 
