@@ -67,8 +67,8 @@ def magnitude_of_gradients(RGB_img):
     y_gradient = convolution2D(gray, y_Sobel)
 
     # 3.1.4 Nutzen Sie die zwei resultierenden Gradienten um die gesammt Gradientenlängen an jedem Pixel auszurechnen.
-    # return np.sqrt(x_gradient ** 2, y_gradient ** 2)
-    return np.hypot(x_gradient, y_gradient)
+    return np.sqrt(x_gradient ** 2, y_gradient ** 2)
+    #return np.hypot(x_gradient, y_gradient)
 
 
 # Diese if Abfrage (if __name__ == '__main__':) sorgt dafür, dass der Code nur
