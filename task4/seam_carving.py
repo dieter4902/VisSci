@@ -84,25 +84,19 @@ def create_seam_mask(accumE):
     return Mask
 
 
-# ------------------------------------------------------------------------------
-# Main Bereich
-# ------------------------------------------------------------------------------
-if __name__ == '__main__':
+def carve(path, number_of_seams_to_remove):
     # --------------------------------------------------------------------------
     # Initalisierung
     # --------------------------------------------------------------------------
     # lädt das Bild
-    img = mpimage.imread('bilder/tower.jpg')  # 'bilder/bird.jpg')
+    img = mpimage.imread('bilder/{}.jpg'.format(path))  # 'bilder/bird.jpg')
     # erstellt eine globale Maske
     # In der Maske sollen alle Pfade gespeichert werden die herrausgeschnitten wurden
     # An Anfang ist noch nichts herrausgeschnitten, also ist die Maske komplett False
     global_mask = np.zeros((img.shape[0], img.shape[1]), dtype=bool)
 
-
     # Parameter einstellen:
     # Tipp: hier number_of_seams_to_remove am Anfang einfach mal auf 1 setzen
-    number_of_seams_to_remove = 10
-
     # erstellet das neue Bild, welches verkleinert wird
     new_img = np.array(img, copy=True)
     copy_img = np.array(img, copy=True)
@@ -112,7 +106,6 @@ if __name__ == '__main__':
     # --------------------------------------------------------------------------
     # Für jeden Seam, der entfernt werden soll:
     for idx in range(number_of_seams_to_remove):
-        ...
         # Aufgabe 1:
         # 1.1 Berechnen Sie die Gradientenlängen des Eingabe Bildes
         # und nutzen Sie diese als Energie-Werte. Sie können dazu Ihre Funktion
@@ -121,12 +114,13 @@ if __name__ == '__main__':
         #               energy = magnitude_of_gradients(new_img)
         # Tipp: Als Test wäre eine einfache Matrix hilfreich:
         energy = magnitude_of_gradients(new_img)
+
         # Aufgabe 2:
+
         # 2.1 Implementieren Sie die Funktion calculate_accum_energy.
         # Sie soll gegeben eine Energy-Matrix die akkumulierten Energien berechnen.
         # Codebeispiel:
         accumE = calculate_accum_energy(energy)
-
         # Aufgabe 3:
         # 3.1 Implementieren Sie die Funktion create_seam_mask.
         # Sie soll gegeben einer akkumulierten Energie-matrix einen Pfad finden,
@@ -149,21 +143,27 @@ if __name__ == '__main__':
 
         new_img = seam_carve(new_img, seam_mask)
         # Aufgabe 5:
-        # 5.1 TODO: Updaten Sie die globale Maske mit dem aktuellen Seam (update_global_mask).
+        # 5.1 Updaten Sie die globale Maske mit dem aktuellen Seam (update_global_mask).
         global_mask = update_global_mask(global_mask, seam_mask)
-        print(global_mask)
-        # 5.2 TODO: Kopieren Sie das Originalbild und färben Sie alle Pfade, die bisher
-        #            entfert wurden, rot mithilfe der globalen Maske
+        # 5.2 Kopieren Sie das Originalbild und färben Sie alle Pfade, die bisher entfert wurden, rot mithilfe der globalen Maske
         # Codebeispiel:
         copy_img[global_mask, :] = [255, 0, 0]
         # Aufgabe 6:
-        # 6.1 TODO: Speichere das verkleinerte Bild
-        mpimage.imsave("1.png", copy_img, )
-        mpimage.imsave("2.png", new_img, cmap="gray")
-        # 6.2 TODO: Speichere das Orginalbild mit allen bisher entfernten Pfaden
-
-        # 6.3 TODO: Gebe die neue Bildgröße aus:
-        # Codebeispiel:
+        # 6.1 Speichere das verkleinerte Bild
+        mpimage.imsave("smallerImg/{}{}.png".format(path, idx), new_img)
+        # 6.2 Speichere das Orginalbild mit allen bisher entfernten Pfaden
+        mpimage.imsave("removedPaths/{}{}.png".format(path, idx), copy_img)
+        # 6.3 Gebe die neue Bildgröße aus:
         print(idx, " image carved:", new_img.shape)
+    return new_img
 
-        # 6.4. TODO: Speichere das resultierende Bild nocheinmal extra.
+
+# ------------------------------------------------------------------------------
+# Main Bereich
+# ------------------------------------------------------------------------------
+if __name__ == '__main__':
+    number_of_seams_to_remove = 20
+    images = ["tower", "bird"]
+    for path in images:
+        # 6.4. Speichere das resultierende Bild nocheinmal extra.
+        mpimage.imsave("final/{}.png".format(path), carve(path, number_of_seams_to_remove))

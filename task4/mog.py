@@ -33,10 +33,9 @@ def convolution2D(img, kernel):
     x, y = np.shape(new_img)
 
     # 1.1.2 Implementieren Sie die Faltung.
-
-    for r in range(padding_x, x - (k_x - padding_x)):  # bei 1 und nicht 0 anfangen wegen padding
-        for c in range(padding_y, y - (k_y - padding_y)):
-            new_img[r, c] = np.sum(
+    for r in range(padding_x, x + padding_x):  # bei 1 und nicht 0 anfangen wegen padding
+        for c in range(padding_y, y + padding_x):
+            new_img[r - padding_x, c - padding_y] = np.sum(
                 kernel * padded_img[r - padding_x: r + k_x - padding_x, c - padding_y:c + k_y - padding_y])
     # Achtung: die Faltung (convolution) soll mit beliebig großen Kernels funktionieren.
     # Tipp: Nutzen Sie so gut es geht Numpy, sonst dauert der Algorithmus zu lange.
@@ -67,8 +66,9 @@ def magnitude_of_gradients(RGB_img):
     y_gradient = convolution2D(gray, y_Sobel)
 
     # 3.1.4 Nutzen Sie die zwei resultierenden Gradienten um die gesammt Gradientenlängen an jedem Pixel auszurechnen.
-    return np.sqrt(x_gradient ** 2, y_gradient ** 2)
-    #return np.hypot(x_gradient, y_gradient)
+    # img = np.sqrt(x_gradient ** 2, y_gradient ** 2)
+    img = np.hypot(y_gradient, x_gradient)
+    return img
 
 
 # Diese if Abfrage (if __name__ == '__main__':) sorgt dafür, dass der Code nur
@@ -96,9 +96,9 @@ if __name__ == '__main__':
     # 2.1 Definieren Sie mindestens 5 verschiedene Kernels (darunter sollten beide Sobel sein) und testen Sie sie auf dem grayscale Bild indem Sie convolution2D aufrufen.
     # 2.2 Speichern Sie alle Resultate als Bilder (sehe Tipp 2). Es sollten 5 Bilder sein.
 
-    # for kernel in kernels:
-    # gen_img = convolution2D(gray, kernel[1])
-    # mpimage.imsave("img/{}.png".format(kernel[0]), gen_img, cmap="gray")
+    for kernel in kernels:
+        gen_img = convolution2D(gray, kernel[1])
+        mpimage.imsave("img/{}.png".format(kernel[0]), gen_img, cmap="gray")
 
     # Aufgabe 3:
     # 3.1 Implementieren Sie die magnitude_of_gradients Funktion (oben) und testen Sie sie mit dem RGB Bild.
