@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.image as mpimage
 from mog import magnitude_of_gradients
+import time
 
 
 def seam_carve(image, seam_mask):
@@ -154,8 +155,54 @@ def carve(path, number_of_seams_to_remove):
         # 6.2 Speichere das Orginalbild mit allen bisher entfernten Pfaden
         mpimage.imsave("removedPaths/{}{}.png".format(path, idx), copy_img)
         # 6.3 Gebe die neue Bildgröße aus:
-        print(idx, " image carved:", new_img.shape)
+        # print(idx, " image carved:", new_img.shape)
     return new_img
+
+
+'''
+exakt gleiche methode wie carve() nur mit dem unterschied, dass mog nicht jedes mal neu generiert wird, sondern immernur ein mal
+'''
+
+
+def betterCarve(path, number_of_seams_to_remove):
+    img = mpimage.imread('bilder/{}.jpg'.format(path))
+    global_mask = np.zeros((img.shape[0], img.shape[1]), dtype=bool)
+    new_img = np.array(img, copy=True)
+    copy_img = np.array(img, copy=True)
+    energy = magnitude_of_gradients(new_img)
+    for idx in range(number_of_seams_to_remove):
+        accumE = calculate_accum_energy(energy)
+        seam_mask = create_seam_mask(accumE)
+        new_img = seam_carve(new_img, seam_mask)
+        energy = seam_carve(energy, seam_mask)
+        global_mask = update_global_mask(global_mask, seam_mask)
+        copy_img[global_mask, :] = [255, 0, 0]
+        mpimage.imsave("smallerImg/better{}{}.png".format(path, idx), new_img)
+        mpimage.imsave("removedPaths/better{}{}.png".format(path, idx), copy_img)
+    return new_img
+
+'''betterCarve nur ohne speichern von zwischenbildern'''
+def ultimateCarve(path, number_of_seams_to_remove):
+    img = mpimage.imread('bilder/{}.jpg'.format(path))
+    global_mask = np.zeros((img.shape[0], img.shape[1]), dtype=bool)
+    new_img = np.array(img, copy=True)
+    energy = magnitude_of_gradients(new_img)
+    for idx in range(number_of_seams_to_remove):
+        accumE = calculate_accum_energy(energy)
+        seam_mask = create_seam_mask(accumE)
+        energy = seam_carve(energy, seam_mask)
+        global_mask = update_global_mask(global_mask, seam_mask)
+    new_img = seam_carve(new_img, ~global_mask)
+    return new_img
+
+
+def benchmarkMethod(method, number_of_seams_to_remove, images):
+    start = time.time()
+    for path in images:
+        # 6.4. Speichere das resultierende Bild nocheinmal extra.
+        mpimage.imsave("final/{}{}.png".format(method.__name__,path), method(path, number_of_seams_to_remove))
+    end = time.time()
+    print("{}: ".format(method.__name__), end - start, " seconds")
 
 
 # ------------------------------------------------------------------------------
@@ -163,7 +210,11 @@ def carve(path, number_of_seams_to_remove):
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     number_of_seams_to_remove = 20
-    images = ["tower", "bird"]
-    for path in images:
-        # 6.4. Speichere das resultierende Bild nocheinmal extra.
-        mpimage.imsave("final/{}.png".format(path), carve(path, number_of_seams_to_remove))
+    images = ["tower", "bird", "tower_big"]
+    benchmarkMethod(carve, number_of_seams_to_remove, images)
+    benchmarkMethod(betterCarve, number_of_seams_to_remove, images)
+    benchmarkMethod(ultimateCarve, number_of_seams_to_remove, images)
+    '''benchmark bei 20 seams
+    carve:  190.74332857131958  seconds
+    betterCarve:  62.26440382003784  seconds
+    ultimateCarve:  53.206398725509644  seconds'''
