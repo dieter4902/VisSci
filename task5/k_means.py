@@ -79,6 +79,7 @@ def update_centers(points, centers, indices):
     Updates the cluster centers depending on the point assignment (indices).
     The new cluster center is the mean of all points belonging to this cluster center.
 
+
     :param points: ndarray with shape (N,d) containing datasetpoints, where
                    N is number of points and d is the dimension of the points.
     :param centers: ndarray with shape (k,d) containing the current cluster centers,
@@ -87,8 +88,13 @@ def update_centers(points, centers, indices):
                     center for every point.
     :return: new cluster centers
     """
+    new_centers = np.zeros([len(centers)])
     # 2.2.1 Updaten Sie die cluster centers mit dem Durchschnittspunkt in jedem Cluster
-    ...
+    for i, center in enumerate(centers):
+        cluster_position = np.average(points[np.argwhere(indices == i)])
+        new_centers[i] = cluster_position
+
+    return new_centers
 
 
 def k_means(points, k, iterations=10):
@@ -106,18 +112,20 @@ def k_means(points, k, iterations=10):
     """
     # 1. Initializieren Sie die cluster centers und die indices.
     # Implementieren Sie dazu die Funktion initialize
-    cluster_centers = initialize(points, k)
+    centers = initialize(points, k)
 
     # 2. Pro iteration:
     # 2.1 Weisen Sie den Punkten die jeweiligen cluster center zu
     # Implementieren Sie dazu die Funktion assign_to_center
-    indices, overall_distance = assign_to_center(points, cluster_centers)
+    for i in range(iterations):
+        indices, overall_distance = assign_to_center(points, centers)
+        centers = update_centers(points, centers, indices)
+        plot_clusters(points, centers, indices)
 
-    # 2.2 TODO Aktualisieren Sie die neuen cluster center anhand der berechneten indices.
-    # Implementieren Sie dazu die Funktion update_centers
+        # 2.2 Aktualisieren Sie die neuen cluster center anhand der berechneten indices.
+        # Implementieren Sie dazu die Funktion update_centers
 
-    # 2.3 (optional) Plotten Sie die cluster und Datenpunkte mittels plot_clusters
-    # plot_clusters(points, centers, indices)
+        # 2.3 (optional) Plotten Sie die cluster und Datenpunkte mittels plot_clusters
 
     # 2.4 (optional) Brechen Sie die Schleife vorzeitig ab sollten sich die
     # Distanz zu den cluster centern kaum noch verändert haben
