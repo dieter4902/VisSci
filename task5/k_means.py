@@ -33,11 +33,9 @@ def initialize(points, k):
     :return: ndarray with shape(k,d) containing the random cluster centers
     """
     # 1.1 Initlaizieren Sie das cluster center ndarray
-    cluster_centers = np.zeros([k, len(points[0])])
     # 1.2 Pro cluster center (k) wähle einen zufälligen Punkt als cluster center
-    p = points.tolist()
-    for cluster in range(k):
-        cluster_centers[cluster] = p.pop(np.random.randint(0, len(p)))
+    rnd_indices = np.random.choice(len(points), size=k)
+    cluster_centers = points[rnd_indices]
     # 1.3 Returnen Sie die cluster center
     return cluster_centers
 
@@ -69,7 +67,6 @@ def assign_to_center(points, centers):
                 closest = j
         indices[i] = closest
         overall_distance += dist
-
         # 2.1.2 Returnen Sie die Indices sowie die Summe der Abstände
     return indices, overall_distance
 
@@ -88,11 +85,11 @@ def update_centers(points, centers, indices):
                     center for every point.
     :return: new cluster centers
     """
-    new_centers = np.zeros([len(centers)])
+    new_centers = centers.copy()
     # 2.2.1 Updaten Sie die cluster centers mit dem Durchschnittspunkt in jedem Cluster
-    for i, center in enumerate(centers):
-        cluster_position = np.average(points[np.argwhere(indices == i)])
-        new_centers[i] = cluster_position
+    for i in range(len(centers)):
+        p = points[np.argwhere(indices == i)]
+        new_centers[i] = [np.average(p[:, :, 0]), np.average(p[:, :, 1])]
 
     return new_centers
 
@@ -113,26 +110,25 @@ def k_means(points, k, iterations=10):
     # 1. Initializieren Sie die cluster centers und die indices.
     # Implementieren Sie dazu die Funktion initialize
     centers = initialize(points, k)
-
     # 2. Pro iteration:
     # 2.1 Weisen Sie den Punkten die jeweiligen cluster center zu
     # Implementieren Sie dazu die Funktion assign_to_center
+
     for i in range(iterations):
         indices, overall_distance = assign_to_center(points, centers)
         centers = update_centers(points, centers, indices)
         plot_clusters(points, centers, indices)
 
-        # 2.2 Aktualisieren Sie die neuen cluster center anhand der berechneten indices.
-        # Implementieren Sie dazu die Funktion update_centers
+    # 2.2 Aktualisieren Sie die neuen cluster center anhand der berechneten indices.
+    # Implementieren Sie dazu die Funktion update_centers
 
-        # 2.3 (optional) Plotten Sie die cluster und Datenpunkte mittels plot_clusters
+    # 2.3 (optional) Plotten Sie die cluster und Datenpunkte mittels plot_clusters
 
     # 2.4 (optional) Brechen Sie die Schleife vorzeitig ab sollten sich die
     # Distanz zu den cluster centern kaum noch verändert haben
 
     # 3. Return cluster centers und indices
-    ...
-    return None, None
+    return centers, indices
 
 
 # ---------------------------------------------------------------------------
