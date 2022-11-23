@@ -89,7 +89,8 @@ def update_centers(points, centers, indices):
     # 2.2.1 Updaten Sie die cluster centers mit dem Durchschnittspunkt in jedem Cluster
     for i in range(len(centers)):
         p = points[np.argwhere(indices == i)]
-        new_centers[i] = [np.average(p[:, :, 0]), np.average(p[:, :, 1])]
+        for j in range(len(centers[0])):
+            new_centers[i, j] = np.average(p[:, :, j])
 
     return new_centers
 
@@ -113,11 +114,15 @@ def k_means(points, k, iterations=10):
     # 2. Pro iteration:
     # 2.1 Weisen Sie den Punkten die jeweiligen cluster center zu
     # Implementieren Sie dazu die Funktion assign_to_center
-
+    indices = []
+    prev_distance = 0
     for i in range(iterations):
         indices, overall_distance = assign_to_center(points, centers)
         centers = update_centers(points, centers, indices)
-        plot_clusters(points, centers, indices)
+        if abs(overall_distance - prev_distance) < overall_distance / 100:
+            print("no significant change after run ", i)
+            break
+        prev_distance = overall_distance
 
     # 2.2 Aktualisieren Sie die neuen cluster center anhand der berechneten indices.
     # Implementieren Sie dazu die Funktion update_centers
@@ -144,20 +149,20 @@ if __name__ == "__main__":
     points = np.loadtxt('kmeans_points.txt')
 
     # Aufrufen von k-means mit den Datenpunkten
-    # TODO: Implementieren Sie k_means:
+    # Implementieren Sie k_means:
     centers, indices = k_means(points, num_clusters, num_iter)
 
     # Plotten des Ergebnisses
-    # plot_clusters(points, centers, indices)
+    plot_clusters(points, centers, indices)
 
     # Wenn k-means funktionstüchtig ist, kann dieser Bereich einkommentiert werden
     # Mit diesm Beispielcode kann in einem Bild die Anzahl der Farben reduziert
     # werden (nötig um ein z.B. ein gif Bild zu generieren):
-    # img = plt.imread("Broadway_tower.jpg").copy()
-    # cc, ci = k_means(img.reshape(-1,3), 256, num_iter)
-    # for i in range(len(cc)):
-    #     map = ci.reshape(img.shape[:2])
-    #     img[map == i,:] = cc[i]
-    #
-    # plt.imshow(img)
-    # plt.show()
+    img = plt.imread("images/Broadway_tower.jpg").copy()
+    cc, ci = k_means(img.reshape(-1, 3), 16, num_iter)
+    for i in range(len(cc)):
+        map = ci.reshape(img.shape[:2])
+        img[map == i, :] = cc[i]
+
+    plt.imshow(img)
+    plt.show()
