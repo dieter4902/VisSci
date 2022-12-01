@@ -7,7 +7,7 @@ from collections import Counter
 def distance(a, b):
     """calculates the distance between two vectors (or matrices)"""
     # 2.1.1 Berechnen Sie die Distanz zwischen zwei Matritzen/Bildern
-    ...
+    #TODO
 
 
 def knn(query, data, labels, k):
@@ -25,7 +25,7 @@ def knn(query, data, labels, k):
     """
     # 2.1 Berechnen Sie die Distanzen von query zu allen Elementen in data
     # Implementieren Sie dazu die Funktion distance
-    ...
+    distances = distance(query, data)
     # 2.2 Finden Sie die k nächsten datenpunkte in data
 
     # 2.3 Geben Sie das Label, welches am häufigsten uner den k nächsten Nachbar
@@ -44,8 +44,18 @@ if __name__ == "__main__":
     # Liste_der_Datenpunkte[i] gehört zu Liste_der_Labels[i].
     # Die Listen sind also gleich lang.
     # Tipp:
+
     # mit glob.glob("images/db/test/*") bekommen Sie eine Liste mit allen Dateien in dem angegebenen Verzeichnis
-    ...
+    test_data = glob.glob("images/db/test/*")
+    train_files = []
+    train_labels = []
+    for data in glob.glob("images/db/train/*"):
+        label = data.rpartition('\\')[-1]
+        for picture in glob.glob("images/db/train/{}/*".format(label)):
+            train_files.append(picture)
+            train_labels.append(label)
+    print(train_files)
+    print(train_labels)
     # 2. Implementieren Sie die Funktion knn.
 
     # 3. Laden Sie die Testbilder aus dem Ordner "images/db/test/" und rufen Sie
