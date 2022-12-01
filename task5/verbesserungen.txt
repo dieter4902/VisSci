@@ -1,0 +1,8 @@
+das programm kann mit einigen punkten verbessert werden:
+    zum einen können gelabelte daten hinzugefügt werden um die genauigkeit des programms sicher zu stellen
+
+    zusätzlich könnte man gucken, dass dan programm nach einer falsch aussage bezüglich eines bildes korrigiert wird und,
+    dass das programm aus diesem fehler lernt (machine learning? :eyes:)
+
+    vielleicht könnte man auch mehr label rein bringen um zum einen mehr eigenschaften zu erkennen und genauer zu erklären,
+    was in dem bild zu sehen ist
