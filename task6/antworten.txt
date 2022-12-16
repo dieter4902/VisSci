@@ -1,0 +1,16 @@
+1.A)
+da die pca mit bildern von dreien aufgebaut wurde und nicht mit bildern von einsen,
+sieht die rekonstruktion eher aus wie eine 3, da die pca ja dazu verwendet wurde sie zu "rekonstruieren"
+wobei hier gesagt werden kann, dass die bildqualität sehr schlecht ist
+
+B)das ergebniss ist, dass man wie vorher auch eine 3 sieht, aber nicht mehr wirklich mit den gleichen eigenschaften,
+eher generallisiert
+
+C)da das pca mit bildern von dreien aufgebaut wurde kann man mit diesem in der theorie erkennen,
+ob ein gegebenes bild eine drei beinhaltet oder nicht
+
+2.A)
+
+B)
+
+C)

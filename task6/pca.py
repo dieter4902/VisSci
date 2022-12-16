@@ -108,3 +108,12 @@ if __name__ == '__main__':
     plt.show()
 
     # TODO: Ihre Erforschung
+
+    plot_image(data[0])
+    plt.show()
+    three = data[0]
+    fo = three.reshape(-1, 1).T
+    point_2d = project_points_into_low_space(fo)
+    reconstr = project_points_into_orginal_space(point_2d)
+    plot_image(reconstr)
+    plt.show()
