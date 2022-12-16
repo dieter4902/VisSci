@@ -7,7 +7,7 @@ from collections import Counter
 def distance(a, b):
     """calculates the distance between two vectors (or matrices)"""
     # 2.1.1 Berechnen Sie die Distanz zwischen zwei Matritzen/Bildern
-    return np.linalg.norm(a - b)
+    return np.sum(abs(a - b))
 
 
 def knn(query, data, labels, k):
@@ -73,6 +73,6 @@ if __name__ == "__main__":
             img = plt.imread(img_path).copy()
             res = knn(img, train_files, train_labels, k)
             all_correct &= expected == res[0]
-            #print(res)
+            # print("expected:",expected,", actual result:",res)
         if all_correct:
             print("k=", k, "all correct")
