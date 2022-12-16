@@ -9,6 +9,7 @@ import os
     This package is to be used as a library. Please do not edit.
 '''
 
+
 def plot_singular_values_and_energy(sv: np.ndarray, k: int):
     """
     Plot singular values and accumulated magnitude of singular values.
@@ -71,7 +72,8 @@ def visualize_eigenfaces(n: int, pcs: np.ndarray, sv: np.ndarray, dim_x: int, di
     plt.show()
 
 
-def plot_identified_faces(best: np.ndarray, training_images: list, test_images: list, pcs: np.ndarray, coeffs_test: np.ndarray, mean_data: np.ndarray):
+def plot_identified_faces(best: np.ndarray, training_images: list, test_images: list, pcs: np.ndarray,
+                          coeffs_test: np.ndarray, mean_data: np.ndarray):
     # find best match, compute confidence and plot
     """
     Plot identified face and reconstructed face according to scores matrix.

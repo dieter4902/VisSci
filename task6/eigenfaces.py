@@ -102,7 +102,7 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
 
 
 def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
-np.ndarray):
+        np.ndarray):
     """
     Perform face recognition for test images assumed to contain faces.
 
