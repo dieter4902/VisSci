@@ -20,7 +20,11 @@ def load_images(path: str) -> list:
     # speichern Sie es in einer "Datenbank" eine Liste.
     # Tipp: Mit glob.glob("data/train/*") bekommen Sie eine Liste mit allen
     # Dateien in dem angegebenen Verzeichnis.
-    ...
+
+    images = []
+    for image in glob.glob(path):
+        images.append(plt.imread(image))
+    return images
 
     # 1.2 Geben Sie die Liste zurück
 
@@ -35,10 +39,17 @@ def setup_data_matrix(images: list) -> np.ndarray:
     """
     # 2.1 Initalisiere die Datenmatrix mit der richtigen Größe und Typ.
     # Achtung! Welche Dimension hat die Matrix?
-    ...
+    num_images = len(images)
+    image_shape = images[0].shape
+
+    # Initialize data matrix with appropriate size and type
+    D = np.empty((num_images, np.prod(image_shape)), dtype=np.float64)
 
     # 2.2 Fügen Sie die Bilder als Zeilen in die Matrix ein.
+    for i, image in enumerate(images):
+        D[i, :] = image.flatten()
 
+    return D
     # 2.3 Geben Sie die Matrix zurück
 
 
@@ -52,15 +63,15 @@ def calculate_svd(D: np.ndarray) -> (np.ndarray, np.ndarray, np.ndarray):
     :return singular_values: singular values associated with eigenvectors
     :return mean_data: mean that was subtracted from data
     """
-    ...
     # 3.1 Berechnen Sie den Mittelpukt der Daten
     # Tipp: Dies ist in einer Zeile möglich (np.mean, besitzt ein Argument names axis)
-    ...
-
+    mean_data = np.mean(D, axis=0)
+    centered_data  = D - mean_data
+    eigenvec, singular_values, _ = np.linalg.svd(centered_data, full_matrices=False)
     # 3.2 Berechnen Sie die Hauptkomponeten sowie die Singulärwerte der ZENTRIERTEN Daten.
     # Dazu können Sie numpy.linalg.svd(..., full_matrices=False) nutzen.
-
     # 3.3 Geben Sie die Hauptkomponenten, die Singulärwerte sowie den Mittelpunkt der Daten zurück
+    return eigenvec, singular_values, mean_data
 
 
 def accumulated_energy(singular_values: np.ndarray, threshold: float = 0.8) -> int:
@@ -73,9 +84,16 @@ def accumulated_energy(singular_values: np.ndarray, threshold: float = 0.8) -> i
 
     :return k: threshold index
     """
-    # 4.1 Normalizieren Sie die Singulärwerte d.h. die Summe aller Singlärwerte soll 1 sein
-    ...
 
+    # 4.1 Normalizieren Sie die Singulärwerte d.h. die Summe aller Singlärwerte soll 1 sein
+    singular_values /= np.sum(singular_values)
+    k = 0
+    energy = 0
+    while energy < threshold:
+        energy += singular_values[k]
+        k += 1
+
+    return k
     # 4.2 Finden Sie den index k, sodass die ersten k Singulärwerte >= dem Threshold sind.
 
     # 4.3 Geben Sie k zurück
@@ -123,18 +141,22 @@ if __name__ == '__main__':
     ...
     # 1. Aufgabe: Laden Sie die Trainingsbilder.
     # Implementieren Sie dazu die Funktion load_images.
+    train_img = load_images("data/train/*")
 
     # 2. Aufgabe: Konvertieren Sie die Bilder zu Vektoren die Sie alle übereinander speichern,
     # sodass sich eine n x m Matrix ergibt (dabei ist n die Anzahl der Bilder und m die Länge des Bildvektors).
     # Implementieren Sie dazu die Funktion setup_data_matrix.
+    D = setup_data_matrix(train_img)
 
     # 3. Aufgabe: Finden Sie alle Hauptkomponeten des Datensatztes.
     # Implementieren Sie dazu die Funktion calculate_svd
+    eigenvec, singular_values, mean_data = calculate_svd(D)
 
     # 4. Aufgabe: Entfernen Sie die "unwichtigsten" Basisvektoren.
     # Implementieren Sie dazu die Funktion accumulated_energy um zu wissen wie viele
     # Baisvektoren behalten werden sollen. Plotten Sie Ihr Ergebniss mittels
     # lib.plot_singular_values_and_energy
+    k = accumulated_energy(singular_values)
 
     # 5. Aufgabe: Projizieren Sie die Trainingsdaten in den gefundenen k-dimensionalen Raum,
     # indem Sie die Koeffizienten für die gefundene Basis finden.
