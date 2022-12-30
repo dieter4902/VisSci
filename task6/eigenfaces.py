@@ -66,7 +66,7 @@ def calculate_svd(D: np.ndarray) -> (np.ndarray, np.ndarray, np.ndarray):
     # 3.1 Berechnen Sie den Mittelpukt der Daten
     # Tipp: Dies ist in einer Zeile möglich (np.mean, besitzt ein Argument names axis)
     mean_data = np.mean(D, axis=0)
-    centered_data  = D - mean_data
+    centered_data = D - mean_data
     eigenvec, singular_values, _ = np.linalg.svd(centered_data, full_matrices=False)
     # 3.2 Berechnen Sie die Hauptkomponeten sowie die Singulärwerte der ZENTRIERTEN Daten.
     # Dazu können Sie numpy.linalg.svd(..., full_matrices=False) nutzen.
@@ -111,12 +111,19 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
     """
     # 5.1 Initialisieren Sie die Koeffizienten für die Basis.
     # Sie sollen als Zeilen in einem np.array gespeichert werden.
-    ...
+    coefficients = np.empty((len(images), pcs.shape[0]))
+    P = np.zeros(images[0].shape)
 
     # 5.1 Berechnen Sie für jedes Bild die Koeffizienten.
     # Achtung! Denkt daran, dass die Daten zentriert werden müssen.
+    for i, img in enumerate(images):
+        centered_img = img - np.reshape(mean_data, img.shape)
+        coefficients[i,:] = np.dot(centered_img, pcs.T)
+
+
 
     # 5.2 Geben Sie die Koeffizenten zurück
+    return coefficients
 
 
 def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
@@ -161,6 +168,7 @@ if __name__ == '__main__':
     # 5. Aufgabe: Projizieren Sie die Trainingsdaten in den gefundenen k-dimensionalen Raum,
     # indem Sie die Koeffizienten für die gefundene Basis finden.
     # Implementieren Sie dazu die Funktion project_faces
+    coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
 
     # 6. Aufgabe: Laden Sie die Test Bilder (load_images).
 
