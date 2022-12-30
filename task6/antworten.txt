@@ -6,11 +6,11 @@ wobei hier gesagt werden kann, dass die bildqualität sehr schlecht ist
 B)das ergebniss ist, dass man wie vorher auch eine 3 sieht, aber nicht mehr wirklich mit den gleichen eigenschaften,
 eher generallisiert
 
-C)da das pca mit bildern von dreien aufgebaut wurde kann man mit diesem in der theorie erkennen,
-ob ein gegebenes bild eine drei beinhaltet oder nicht
+C)pca kann man schlussfolglich benutzen um die dimensionen zu reduzieren, die wichtigsten informationen aber beizubehalten
 
-2.A)
+2.A)die erste komponente bschreibt, welches feature in den bildern die größte varianz hat
+wenn sie negativ ist heißt es, dass sie gegensätzlich zu der mehrheit der anderen komponenten platziert ist
 
-B)
+B)ja, wie die erste komponente das feature mit der größten varianz beschreibt, so beschreibt die zweite das feature mit der zweitstärksten varianz
 
-C)
+C)bilder von dreien können reduziert werden und gleichzeitig ihr alleinstellungsmerkmale gegenüber den anderen dreien beibehalten
