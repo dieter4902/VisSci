@@ -120,17 +120,15 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
         P = np.zeros(pcs.shape)
         print(centered_img.shape)
         print(P.shape)
-        P[:len(centered_img),:] += centered_img[:len(P[0]),:len(P)]
-        coefficients[i,:] = np.dot(P, pcs.T)
-
-
+        P[:len(centered_img), :] += centered_img[:len(P[0]), :len(P)]
+        coefficients[i, :] = np.dot(P, pcs.T)
 
     # 5.2 Geben Sie die Koeffizenten zurück
     return coefficients
 
 
 def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
-        np.ndarray):
+    np.ndarray):
     """
     Perform face recognition for test images assumed to contain faces.
 
@@ -171,15 +169,18 @@ if __name__ == '__main__':
     # 5. Aufgabe: Projizieren Sie die Trainingsdaten in den gefundenen k-dimensionalen Raum,
     # indem Sie die Koeffizienten für die gefundene Basis finden.
     # Implementieren Sie dazu die Funktion project_faces
-    coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
+    train_coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
 
     # 6. Aufgabe: Laden Sie die Test Bilder (load_images).
+    test_images = load_images("data/test/*")
 
     # 7. Aufgabe: Projizieren Sie die Testbilder in den gefundenen k-dimensionalen Raum (project_faces).
+    test_coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
 
     # 8. Aufgabe: Berechnen Sie für jedes Testbild das nächste Trainingsbild in dem
     # gefundenen k-dimensionalen Raum. Die Distanzfunktion ist über den Winkel zwischen den Punkten definiert.
     # Implementieren Sie dazu die Funktion identify_faces.
+    match_indices = identify_faces(train_coefficients, test_coefficients)
     # Plotten Sie ihr Ergebniss mit der Funktion lib.plot_identified_faces
-
+    lib.plot_identified_faces(match_indices, train_img, test_images, eigenvec, test_coefficients, mean_data)
     # plot the identified faces
