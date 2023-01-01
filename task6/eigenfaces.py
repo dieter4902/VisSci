@@ -121,7 +121,7 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
         print(centered_img.shape)
         print(P.shape)
         P[:len(centered_img), :] += centered_img[:len(P[0]), :len(P)]
-        coefficients[i, :] = np.dot(P, pcs.T)
+        coefficients[i, :] = np.dot(P, pcs.T)  # funktioniert alles nicht 😩
 
     # 5.2 Geben Sie die Koeffizenten zurück
     return coefficients
@@ -142,7 +142,13 @@ def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
     """
     # 8.1 Berechnen Sie für jeden Testvektor den nächsten Trainingsvektor.
     # Achtung! Die Distanzfunktion ist definiert über den Winkel zwischen den Vektoren.
-    ...
+    indices = np.empty(coeffs_test.shape[0], dtype=int)
+    for i, coeffs_test_img in enumerate(coeffs_test):
+        angles = np.arccos(np.sum(coeffs_test_img * coeffs_train, axis=1) / (
+                np.linalg.norm(coeffs_test_img) * np.linalg.norm(coeffs_train, axis=1)))
+        index = np.argmin(angles)
+        indices[i] = index
+    return indices
 
 
 if __name__ == '__main__':
