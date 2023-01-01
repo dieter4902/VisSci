@@ -118,7 +118,6 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
     # 5.2 Geben Sie die Koeffizenten zurück
     coefficients = np.zeros((len(images), pcs.shape[0]))
 
-    # Compute coefficients for each image
     for i, image in enumerate(images):
         centered_image = image - np.reshape(mean_data, image.shape)
         coefficients[i, :] = np.dot(pcs, centered_image)# funktioniert alles nicht 😩
@@ -187,4 +186,4 @@ if __name__ == '__main__':
     match_indices = identify_faces(train_coefficients, test_coefficients)
     # Plotten Sie ihr Ergebniss mit der Funktion lib.plot_identified_faces
     lib.plot_identified_faces(match_indices, train_img, test_images, eigenvec, test_coefficients, mean_data)
-    # plot the identified faces
+
