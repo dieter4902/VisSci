@@ -120,7 +120,7 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
 
     for i, image in enumerate(images):
         centered_image = image - np.reshape(mean_data, image.shape)
-        coefficients[i, :] = np.dot(pcs, centered_image)# funktioniert alles nicht 😩
+        coefficients[i, :] = np.dot(centered_image, pca.T)# funktioniert alles nicht 😩
     return coefficients
 
 
