@@ -111,24 +111,22 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
     """
     # 5.1 Initialisieren Sie die Koeffizienten für die Basis.
     # Sie sollen als Zeilen in einem np.array gespeichert werden.
-    coefficients = np.empty((len(images), pcs.shape[0]))
 
     # 5.1 Berechnen Sie für jedes Bild die Koeffizienten.
     # Achtung! Denkt daran, dass die Daten zentriert werden müssen.
-    for i, img in enumerate(images):
-        centered_img = img - np.reshape(mean_data, img.shape)
-        P = np.zeros(pcs.shape)
-        print(centered_img.shape)
-        print(P.shape)
-        P[:len(centered_img), :] += centered_img[:len(P[0]), :len(P)]
-        coefficients[i, :] = np.dot(P, pcs.T)  # funktioniert alles nicht 😩
 
     # 5.2 Geben Sie die Koeffizenten zurück
+    coefficients = np.zeros((len(images), pcs.shape[0]))
+
+    # Compute coefficients for each image
+    for i, image in enumerate(images):
+        centered_image = image - np.reshape(mean_data, image.shape)
+        coefficients[i, :] = np.dot(pcs, centered_image)# funktioniert alles nicht 😩
     return coefficients
 
 
 def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
-    np.ndarray):
+        np.ndarray):
     """
     Perform face recognition for test images assumed to contain faces.
 
