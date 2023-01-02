@@ -139,18 +139,12 @@ def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
     # Achtung! Die Distanzfunktion ist definiert über den Winkel zwischen den Vektoren.
     indices = np.empty(coeffs_test.shape[0], dtype=int)
     for i, coeffs_test_img in enumerate(coeffs_test):
-        angles = []
-        for coeffs_train_img in coeffs_train:
-            v1_u = unit_vector(coeffs_test_img)
-            v2_u = unit_vector(coeffs_train_img)
-            angles.append(np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)))
+        angles = np.arccos(np.sum(coeffs_test_img * coeffs_train, axis=1) / (
+                np.linalg.norm(coeffs_test_img) * np.linalg.norm(coeffs_train, axis=1)))
+
         index = np.argmin(angles)
         indices[i] = index
     return indices
-
-def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
-    return vector / np.linalg.norm(vector)
 
 
 if __name__ == '__main__':
