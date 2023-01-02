@@ -151,12 +151,12 @@ if __name__ == '__main__':
     ...
     # 1. Aufgabe: Laden Sie die Trainingsbilder.
     # Implementieren Sie dazu die Funktion load_images.
-    train_img = load_images("data/train/*")
+    train_images = load_images("data/train/*")
 
     # 2. Aufgabe: Konvertieren Sie die Bilder zu Vektoren die Sie alle übereinander speichern,
     # sodass sich eine n x m Matrix ergibt (dabei ist n die Anzahl der Bilder und m die Länge des Bildvektors).
     # Implementieren Sie dazu die Funktion setup_data_matrix.
-    D = setup_data_matrix(train_img)
+    D = setup_data_matrix(train_images)
 
     # 3. Aufgabe: Finden Sie alle Hauptkomponeten des Datensatztes.
     # Implementieren Sie dazu die Funktion calculate_svd
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     # 5. Aufgabe: Projizieren Sie die Trainingsdaten in den gefundenen k-dimensionalen Raum,
     # indem Sie die Koeffizienten für die gefundene Basis finden.
     # Implementieren Sie dazu die Funktion project_faces
-    train_coefficients = project_faces(pcs, mean_data, train_img)
+    train_coefficients = project_faces(pcs, mean_data, train_images)
 
     # 6. Aufgabe: Laden Sie die Test Bilder (load_images).
     test_images = load_images("data/test/*")
@@ -188,4 +188,4 @@ if __name__ == '__main__':
     # Implementieren Sie dazu die Funktion identify_faces.
     match_indices = identify_faces(train_coefficients, test_coefficients)
     # Plotten Sie ihr Ergebniss mit der Funktion lib.plot_identified_faces
-    lib.plot_identified_faces(match_indices, train_img, test_images, pcs, test_coefficients, mean_data)
+    lib.plot_identified_faces(match_indices, train_images, test_images, pcs, test_coefficients, mean_data)
