@@ -61,13 +61,13 @@ def calculate_svd(D: np.ndarray) -> (np.ndarray, np.ndarray, np.ndarray):
 
     :return eigenvec: matrix containing principal components as rows
     :return singular_values: singular values associated with eigenvectors
-    :return mean_data: mean that was subtracted from data
+    :return mean_data: mean that was derived from data
     """
     # 3.1 Berechnen Sie den Mittelpukt der Daten
     # Tipp: Dies ist in einer Zeile möglich (np.mean, besitzt ein Argument names axis)
     mean_data = np.mean(D, axis=0)
     centered_data = D - mean_data
-    eigenvec, singular_values, _ = np.linalg.svd(centered_data, full_matrices=False)
+    _, singular_values, eigenvec = np.linalg.svd(centered_data, full_matrices=False)
     # 3.2 Berechnen Sie die Hauptkomponeten sowie die Singulärwerte der ZENTRIERTEN Daten.
     # Dazu können Sie numpy.linalg.svd(..., full_matrices=False) nutzen.
     # 3.3 Geben Sie die Hauptkomponenten, die Singulärwerte sowie den Mittelpunkt der Daten zurück
@@ -111,16 +111,14 @@ def project_faces(pcs: np.ndarray, mean_data: np.ndarray, images: list) -> np.nd
     """
     # 5.1 Initialisieren Sie die Koeffizienten für die Basis.
     # Sie sollen als Zeilen in einem np.array gespeichert werden.
-
+    coefficients = np.zeros((len(images), pcs.shape[0]))
     # 5.1 Berechnen Sie für jedes Bild die Koeffizienten.
     # Achtung! Denkt daran, dass die Daten zentriert werden müssen.
+    for i, image in enumerate(images):
+        centered_image = np.reshape(image, mean_data.shape) - mean_data
+        coefficients[i, :] = np.dot(centered_image, pcs.T)  # 😩😩😩😩😩😩😩
 
     # 5.2 Geben Sie die Koeffizenten zurück
-    coefficients = np.zeros((len(images), pcs.shape[0]))
-
-    for i, image in enumerate(images):
-        centered_image = image - np.reshape(mean_data, image.shape)
-        coefficients[i, :] = np.dot(pcs, centered_image)# funktioniert alles nicht 😩
     return coefficients
 
 
@@ -141,11 +139,18 @@ def identify_faces(coeffs_train: np.ndarray, coeffs_test: np.ndarray) -> (
     # Achtung! Die Distanzfunktion ist definiert über den Winkel zwischen den Vektoren.
     indices = np.empty(coeffs_test.shape[0], dtype=int)
     for i, coeffs_test_img in enumerate(coeffs_test):
-        angles = np.arccos(np.sum(coeffs_test_img * coeffs_train, axis=1) / (
-                np.linalg.norm(coeffs_test_img) * np.linalg.norm(coeffs_train, axis=1)))
+        angles = []
+        for coeffs_train_img in coeffs_train:
+            v1_u = unit_vector(coeffs_test_img)
+            v2_u = unit_vector(coeffs_train_img)
+            angles.append(np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)))
         index = np.argmin(angles)
         indices[i] = index
     return indices
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
 
 
 if __name__ == '__main__':
@@ -163,27 +168,30 @@ if __name__ == '__main__':
     # Implementieren Sie dazu die Funktion calculate_svd
     eigenvec, singular_values, mean_data = calculate_svd(D)
 
+    # lib.visualize_eigenfaces(10, eigenvec, singular_values,  98,116)
+
     # 4. Aufgabe: Entfernen Sie die "unwichtigsten" Basisvektoren.
     # Implementieren Sie dazu die Funktion accumulated_energy um zu wissen wie viele
     # Baisvektoren behalten werden sollen. Plotten Sie Ihr Ergebniss mittels
     # lib.plot_singular_values_and_energy
     k = accumulated_energy(singular_values)
+    pcs = eigenvec[:k, :]
+    # lib.plot_singular_values_and_energy(singular_values, k)
 
     # 5. Aufgabe: Projizieren Sie die Trainingsdaten in den gefundenen k-dimensionalen Raum,
     # indem Sie die Koeffizienten für die gefundene Basis finden.
     # Implementieren Sie dazu die Funktion project_faces
-    train_coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
+    train_coefficients = project_faces(pcs, mean_data, train_img)
 
     # 6. Aufgabe: Laden Sie die Test Bilder (load_images).
     test_images = load_images("data/test/*")
 
     # 7. Aufgabe: Projizieren Sie die Testbilder in den gefundenen k-dimensionalen Raum (project_faces).
-    test_coefficients = project_faces(eigenvec[:k, :], mean_data, train_img)
+    test_coefficients = project_faces(pcs, mean_data, test_images)
 
     # 8. Aufgabe: Berechnen Sie für jedes Testbild das nächste Trainingsbild in dem
     # gefundenen k-dimensionalen Raum. Die Distanzfunktion ist über den Winkel zwischen den Punkten definiert.
     # Implementieren Sie dazu die Funktion identify_faces.
     match_indices = identify_faces(train_coefficients, test_coefficients)
     # Plotten Sie ihr Ergebniss mit der Funktion lib.plot_identified_faces
-    lib.plot_identified_faces(match_indices, train_img, test_images, eigenvec, test_coefficients, mean_data)
-
+    lib.plot_identified_faces(match_indices, train_img, test_images, pcs, test_coefficients, mean_data)
