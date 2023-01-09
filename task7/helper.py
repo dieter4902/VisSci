@@ -1,6 +1,10 @@
-import numpy as np
-import os, pickle, math
+import math
+import os
+import pickle
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 #########################################################################
 #
