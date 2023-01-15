@@ -89,13 +89,18 @@ class TwoLayerNeuralNetwork:
 
         # Berechen Sie den score
         N, D = X.shape
-        # TODO: Berechnen Sie den Forward-Schritt und geben Sie den Vektor mit Scores zurueck
+        # Berechnen Sie den Forward-Schritt und geben Sie den Vektor mit Scores zurueck
         # Nutzen Sie die ReLU Aktivierungsfunktion im ersten Layer
+        m1 = np.dot(self.relu(X), self.W1) + self.b1
+        a1 = self.relu(m1)
+        m2 = np.dot(a1, self.W2) + self.b2
+        a2 = self.softmax(m2)
         # Berechnen Sie die Klassenwahrscheinlichkeiten unter Nutzung der softmax Funktion
 
-        # TODO: Berechnen Sie den Fehler mit der cross-entropy Funktion
+        # Berechnen Sie den Fehler mit der cross-entropy Funktion
 
-        # return loss, m1, a1, a2
+        loss = self.loss_crossentropy(a2, y)
+        return loss, m1, a1, a2
 
     def backward(self, m1, a1, a2, X, y):
         """
@@ -103,26 +108,25 @@ class TwoLayerNeuralNetwork:
         berechnet und die Gradienten der einzelnen Layer als ein Dictionary zurückgegeben.
         Zum Beispiel sollte grads['W1'] die Gradienten von self.W1 enthalten (das ist eine Matrix der gleichen Größe
         wie self.W1.
-        :param m1: Aktivierung aus dem 2.Layer vor Aktivierungsfunktion 
+        :param m1: Aktivierung aus dem 2.Layer vor Aktivierungsfunktion
         :param a1: Aktivierung aus dem 1.Layer
         :param a2: Aktivierung aus dem 2.Layer -> Output des Netzes
         :param X:
         :param y:
-        :return:
+        :return gradienten dictionaty :
         """
         # Backward pass: Berechnen Sie die Gradienten
         N, D = X.shape
 
         # Füllen Sie das Dictionary grads['W2'], grads['b2'], grads['W1'], grads['b1']
-        grads = {}
+        grads = {'W1': None, 'b1': None, 'W2': None, 'b2': None}
 
         # Nutzen Sie dabei die Notizen aus der Vorlesung und die gegebenen Ableitungsfunktionen
 
-        # grads['W1'] =
-        # grads['b1'] =
-
-        # grads['W2'] =
-        # grads['b2'] =
+        grads['W1'] = (1 / N) * np.dot(X.T, (a1 - y))
+        grads['b1'] = (1 / N) * np.sum(a1 - y, axis=0)
+        grads['W2'] = (1 / N) * np.dot(a1.T, (a2 - y))
+        grads['b2'] = (1 / N) * np.sum(a2 - y, axis=0)
         return grads
 
     def train(self, X, y, X_val, y_val,
@@ -157,35 +161,33 @@ class TwoLayerNeuralNetwork:
 
         sample_propabilities = np.ones(X.shape[0])
         for it in range(num_iters):
-            X_batch = None
-            y_batch = None
-
+            mask = np.random.choice(X.shape[0], batch_size)
+            X_batch = X[mask]
+            y_batch = y[mask]
             ############################
-            # TODO: Erzeugen Sie einen zufälligen Batch der Größe batch_size
+            # Erzeugen Sie einen zufälligen Batch der Größe batch_size
             # aus den Trainingsdaten und speichern diese in X_batch und y_batch
-            # X_batch
-            # y_batch
-
             ############################
 
-            # TODO: Berechnung von loss und gradient für den aktuellen Batch
+            # Berechnung von loss und gradient für den aktuellen Batch
 
             # Merken des Fehlers für den Plot
-            loss_history.append(loss)
+            # loss_history.append(loss)
             # Berechnung des Fehlers mit den aktuellen Parametern (W, b)
             # mit dem Testset
-            loss_val, m1_val, a1_val, a2_val = self.forward(X_val, y_val)
-            loss_val_history.append(loss_val)
+            loss, m1, a1, a2 = self.forward(X_batch, y_batch)
+            grads = self.backward(m1, a1, a2, X_batch, y_batch)
+            loss_history.append(loss)
 
             ############################
             # TODO: Nutzen Sie die Gradienten aus der Backward-Funktion und passen
             # Sie die Parameter an (self.W1, self.b1 etc). Diese werden mit der Lernrate
             # gewichtet
 
-            # self.W1 +=
-            # self.W2 +=
-            # self.b1 +=
-            # self.b2 +=
+            self.W1 -= learning_rate * grads['W1']
+            self.b1 -= learning_rate * grads['b1']
+            self.W2 -= learning_rate * grads['W2']
+            self.b2 -= learning_rate * grads['b2']
 
             ############################
 
@@ -230,13 +232,19 @@ class TwoLayerNeuralNetwork:
         y_pred = None
 
         ############################
+        W1, b1 = self.W1, self.b1
+        W2, b2 = self.W2, self.b2
         # TODO: Implementieren Sie die Vorhersage. D.h. für ein/mehrere Bild/er mit den gelernten
         # Parametern den Wahrscheinlichkeit berechnen.
         # np.argmax in dem Wahrscheinlichkeitsvektor ist die wahrscheinlichste Klasse
         ############################
         # Implementieren Sie nochmals den Forward pass um die Wahrscheinlichkeiten
         # vorherzusagen
-        #y_pred = np.argmax(a2, axis=1)
+        m1 = np.dot(self.relu(X), W1) + b1
+        a1 = self.relu(m1)
+        m2 = np.dot(a1, W2) + b2
+        a2 = self.softmax(m2)
+        y_pred = np.argmax(a2, axis=1)
 
         return y_pred
 
@@ -265,7 +273,7 @@ if __name__ == '__main__':
     # systematisch und nicht einfach durch probieren - also z.B. in einem
     # for-loop eine Reihe von Parametern testen und die Einzelbilder abspeichern)
 
-    hidden_size = 50   # Anzahl der Neuronen im Hidden Layer
+    hidden_size = 50  # Anzahl der Neuronen im Hidden Layer
     num_iter = 3000  # Anzahl der Optimierungsiterationen
     batch_size = 100  # Eingabeanzahl der Bilder
     learning_rate = 0.001  # Lernrate
