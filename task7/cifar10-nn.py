@@ -88,13 +88,11 @@ class TwoLayerNeuralNetwork:
         """
 
         # Berechen Sie den score
-        N, D = X.shape
         # Berechnen Sie den Forward-Schritt und geben Sie den Vektor mit Scores zurueck
         # Nutzen Sie die ReLU Aktivierungsfunktion im ersten Layer
         m1 = np.dot(self.relu(X), self.W1) + self.b1
         a1 = self.relu(m1)
-        m2 = np.dot(a1, self.W2) + self.b2
-        a2 = self.softmax(m2)
+        a2 = self.softmax(np.dot(a1, self.W2) + self.b2)
         # Berechnen Sie die Klassenwahrscheinlichkeiten unter Nutzung der softmax Funktion
 
         # Berechnen Sie den Fehler mit der cross-entropy Funktion
@@ -115,23 +113,35 @@ class TwoLayerNeuralNetwork:
         :param y:
         :return gradienten dictionaty :
         """
-        # Backward pass: Berechnen Sie die Gradienten
-        N, D = X.shape
 
         # Füllen Sie das Dictionary grads['W2'], grads['b2'], grads['W1'], grads['b1']
         grads = {'W1': None, 'b1': None, 'W2': None, 'b2': None}
 
         # Nutzen Sie dabei die Notizen aus der Vorlesung und die gegebenen Ableitungsfunktionen
+        dc_da2 = self.loss_deriv_softmax(a2, y)
+        dm2_da1 = self.W2
+        da1_dm1 = self.relu_derivative(m1)
+        dm1_dw1 = X
+        dm2_dw2 = a1
 
-        grads['W1'] = (1 / N) * np.dot(X.T, (a1 - y))
-        grads['b1'] = (1 / N) * np.sum(a1 - y, axis=0)
-        grads['W2'] = (1 / N) * np.dot(a1.T, (a2 - y))
-        grads['b2'] = (1 / N) * np.sum(a2 - y, axis=0)
+        tmp1 = dc_da2 @ dm2_da1.T
+        tmp2 = tmp1 * da1_dm1
+
+        # Backward pass: Berechnen Sie die Gradienten
+        dc_dw1 = np.dot(dm1_dw1.T, tmp2)
+        dc_dw2 = np.dot(dm2_dw2.T, dc_da2)
+        dc_db1 = np.sum(tmp2, axis=0, keepdims=True)
+        dc_db2 = np.sum(dc_da2, axis=0, keepdims=True)
+
+        grads['W1'] = dc_dw1
+        grads['b1'] = dc_db1
+        grads['W2'] = dc_dw2
+        grads['b2'] = dc_db2
         return grads
 
     def train(self, X, y, X_val, y_val,
               learning_rate=1e-3, learning_rate_decay=0.95, num_iters=100,
-              batch_size=200, verbose=False):
+              batch_size=50, verbose=False):
         """
         Training des Neuronalen Netzwerkes unter der Nutzung des iterativen
         Optimierungsverfahrens Stochastic Gradient Descent
@@ -175,12 +185,15 @@ class TwoLayerNeuralNetwork:
             # loss_history.append(loss)
             # Berechnung des Fehlers mit den aktuellen Parametern (W, b)
             # mit dem Testset
+
             loss, m1, a1, a2 = self.forward(X_batch, y_batch)
             grads = self.backward(m1, a1, a2, X_batch, y_batch)
             loss_history.append(loss)
+            # loss_val = self.forward(X_val, y_val)[0]
+            loss_val_history.append(self.forward(X_val, y_val)[0])
 
             ############################
-            # TODO: Nutzen Sie die Gradienten aus der Backward-Funktion und passen
+            # Nutzen Sie die Gradienten aus der Backward-Funktion und passen
             # Sie die Parameter an (self.W1, self.b1 etc). Diese werden mit der Lernrate
             # gewichtet
 
@@ -232,18 +245,15 @@ class TwoLayerNeuralNetwork:
         y_pred = None
 
         ############################
-        W1, b1 = self.W1, self.b1
-        W2, b2 = self.W2, self.b2
-        # TODO: Implementieren Sie die Vorhersage. D.h. für ein/mehrere Bild/er mit den gelernten
+        # Implementieren Sie die Vorhersage. D.h. für ein/mehrere Bild/er mit den gelernten
         # Parametern den Wahrscheinlichkeit berechnen.
         # np.argmax in dem Wahrscheinlichkeitsvektor ist die wahrscheinlichste Klasse
         ############################
         # Implementieren Sie nochmals den Forward pass um die Wahrscheinlichkeiten
         # vorherzusagen
-        m1 = np.dot(self.relu(X), W1) + b1
+        m1 = np.dot(self.relu(X), self.W1) + self.b1
         a1 = self.relu(m1)
-        m2 = np.dot(a1, W2) + b2
-        a2 = self.softmax(m2)
+        a2 = self.softmax(np.dot(a1, self.W2) + self.b2)
         y_pred = np.argmax(a2, axis=1)
 
         return y_pred
