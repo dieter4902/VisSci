@@ -128,15 +128,11 @@ class TwoLayerNeuralNetwork:
         tmp2 = tmp1 * da1_dm1
 
         # Backward pass: Berechnen Sie die Gradienten
-        dc_dw1 = np.dot(dm1_dw1.T, tmp2)
-        dc_dw2 = np.dot(dm2_dw2.T, dc_da2)
-        dc_db1 = np.sum(tmp2, axis=0, keepdims=True)
-        dc_db2 = np.sum(dc_da2, axis=0, keepdims=True)
+        grads['W1'] = np.dot(dm1_dw1.T, tmp2)
+        grads['W2'] = np.dot(dm2_dw2.T, dc_da2)
+        grads['b1'] = np.sum(tmp2, axis=0)
+        grads['b2'] = np.sum(dc_da2, axis=0)
 
-        grads['W1'] = dc_dw1
-        grads['b1'] = dc_db1
-        grads['W2'] = dc_dw2
-        grads['b2'] = dc_db2
         return grads
 
     def train(self, X, y, X_val, y_val,
@@ -174,10 +170,8 @@ class TwoLayerNeuralNetwork:
             mask = np.random.choice(X.shape[0], batch_size)
             X_batch = X[mask]
             y_batch = y[mask]
-            ############################
             # Erzeugen Sie einen zufälligen Batch der Größe batch_size
             # aus den Trainingsdaten und speichern diese in X_batch und y_batch
-            ############################
 
             # Berechnung von loss und gradient für den aktuellen Batch
 
@@ -189,10 +183,8 @@ class TwoLayerNeuralNetwork:
             loss, m1, a1, a2 = self.forward(X_batch, y_batch)
             grads = self.backward(m1, a1, a2, X_batch, y_batch)
             loss_history.append(loss)
-            # loss_val = self.forward(X_val, y_val)[0]
             loss_val_history.append(self.forward(X_val, y_val)[0])
 
-            ############################
             # Nutzen Sie die Gradienten aus der Backward-Funktion und passen
             # Sie die Parameter an (self.W1, self.b1 etc). Diese werden mit der Lernrate
             # gewichtet
@@ -201,8 +193,6 @@ class TwoLayerNeuralNetwork:
             self.b1 -= learning_rate * grads['b1']
             self.W2 -= learning_rate * grads['W2']
             self.b2 -= learning_rate * grads['b2']
-
-            ############################
 
             # Ausgabe des aktuellen Fehlers. Diese sollte am Anfang erstmal nach unten gehen
             # kann aber immer etwas schwanken.
@@ -213,7 +203,7 @@ class TwoLayerNeuralNetwork:
             # und dämpfen die Lernrate
             if it % iterations_per_epoch == 0:
                 # Überprüfung der Klassifikationsgenauigkeit
-                train_acc = (self.predict(X_batch) == y_batch).mean()
+                train_acc = (self.predict(X) == y).mean()
                 val_acc = (self.predict(X_val) == y_val).mean()
                 train_acc_history.append(train_acc)
                 val_acc_history.append(val_acc)
@@ -242,15 +232,6 @@ class TwoLayerNeuralNetwork:
         :return: y_pred Numpy Array der Größe (N,) die die jeweiligen Labels für alle Elemente in X enthaelt.
         y_pred[i] = c bedeutet, das fuer X[i] die Klasse c mit 0<=c<C vorhergesagt wurde
         """
-        y_pred = None
-
-        ############################
-        # Implementieren Sie die Vorhersage. D.h. für ein/mehrere Bild/er mit den gelernten
-        # Parametern den Wahrscheinlichkeit berechnen.
-        # np.argmax in dem Wahrscheinlichkeitsvektor ist die wahrscheinlichste Klasse
-        ############################
-        # Implementieren Sie nochmals den Forward pass um die Wahrscheinlichkeiten
-        # vorherzusagen
         m1 = np.dot(self.relu(X), self.W1) + self.b1
         a1 = self.relu(m1)
         a2 = self.softmax(np.dot(a1, self.W2) + self.b2)
@@ -261,8 +242,7 @@ class TwoLayerNeuralNetwork:
 
 if __name__ == '__main__':
     X_train, y_train, X_val, y_val = helper.prepare_CIFAR10_images()
-    # TODO: Laden der Bilder. Hinweis - wir nutzen nur die Trainigsbilder zum Trainieren und die
-    # Validierungsbilder zum Testen.
+    # Laden der Bilder. Hinweis - wir nutzen nur die Trainigsbilder zum Trainieren und die Validierungsbilder zum Testen
     print('Train data shape: ', X_train.shape)
     print('Train labels shape: ', y_train.shape)
     print('Validation data shape: ', X_val.shape)
@@ -277,7 +257,7 @@ if __name__ == '__main__':
     # Hyperparameter
     #############################################
 
-    # TODO: mit diesen Parametern sollten Sie in etwa auf eine
+    # mit diesen Parametern sollten Sie in etwa auf eine
     # Klassifikationsgenauigkeit von 43% kommen. Optimieren Sie die
     # Hyperparameter um die Genauigkeit zu erhöhen (bitte tun sie das
     # systematisch und nicht einfach durch probieren - also z.B. in einem
