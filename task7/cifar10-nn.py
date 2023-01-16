@@ -278,7 +278,6 @@ if __name__ == '__main__':
 
     print('Final training loss: ', stats['loss_history'][-1])
     print('Final validation loss: ', stats['loss_val_history'][-1])
-
     print('Final validation accuracy: ', stats['val_acc_history'][-1])
 
     helper.plot_net_weights(net)
