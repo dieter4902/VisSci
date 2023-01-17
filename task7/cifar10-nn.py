@@ -90,7 +90,7 @@ class TwoLayerNeuralNetwork:
         # Berechen Sie den score
         # Berechnen Sie den Forward-Schritt und geben Sie den Vektor mit Scores zurueck
         # Nutzen Sie die ReLU Aktivierungsfunktion im ersten Layer
-        m1 = np.dot(self.relu(X), self.W1) + self.b1
+        m1 = np.dot(X, self.W1) + self.b1
         a1 = self.relu(m1)
         a2 = self.softmax(np.dot(a1, self.W2) + self.b2)
         # Berechnen Sie die Klassenwahrscheinlichkeiten unter Nutzung der softmax Funktion
@@ -232,11 +232,14 @@ class TwoLayerNeuralNetwork:
         :return: y_pred Numpy Array der Größe (N,) die die jeweiligen Labels für alle Elemente in X enthaelt.
         y_pred[i] = c bedeutet, das fuer X[i] die Klasse c mit 0<=c<C vorhergesagt wurde
         """
-        m1 = np.dot(self.relu(X), self.W1) + self.b1
-        a1 = self.relu(m1)
+
+        a1 = self.relu(np.dot(X, self.W1) + self.b1)
         a2 = self.softmax(np.dot(a1, self.W2) + self.b2)
         y_pred = np.argmax(a2, axis=1)
-
+        """
+        hidden_layer = self.relu(np.dot(X, self.W1) + self.b1)
+        scores = np.dot(hidden_layer, self.W2) + self.b2
+        y_pred = np.argmax(scores, axis=1)"""
         return y_pred
 
 
@@ -263,19 +266,32 @@ if __name__ == '__main__':
     # systematisch und nicht einfach durch probieren - also z.B. in einem
     # for-loop eine Reihe von Parametern testen und die Einzelbilder abspeichern)
 
-    hidden_size = 50  # Anzahl der Neuronen im Hidden Layer
-    num_iter = 3000  # Anzahl der Optimierungsiterationen
-    batch_size = 100  # Eingabeanzahl der Bilder
-    learning_rate = 0.001  # Lernrate
-    learning_rate_decay = 0.95  # Lernratenabschwächung
+    hidden_size = 250  # Anzahl der Neuronen im Hidden Layer
+    num_iter = 4000  # Anzahl der Optimierungsiterationen
+    batch_size = 300  # Eingabeanzahl der Bilder
+    learning_rate = 0.005  # Lernrate
+    learning_rate_decay = 0.8  # Lernratenabschwächung
 
-    net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)
-
-    # Train the network
+    net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
     stats = net.train(X_train, y_train, X_val, y_val,
                       num_iters=num_iter, batch_size=batch_size,
-                      learning_rate=learning_rate, learning_rate_decay=learning_rate_decay, verbose=True)
+                      learning_rate=learning_rate, learning_rate_decay=learning_rate_decay,
+                      verbose=False)
+    """
+    for num_iter in range(3000, 30000, 1000):
+        print("num_iter =", num_iter)
+        for hidden_size in range(50, 500, 25):
+            print("hidden_size =", hidden_size)
+            for batch_size in range(200, 500, 30):
+                print("batch_size =", batch_size)
 
+                net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
+                stats = net.train(X_train, y_train, X_val, y_val,
+                                  num_iters=num_iter, batch_size=batch_size,
+                                  learning_rate=learning_rate, learning_rate_decay=learning_rate_decay,
+                                  verbose=False)
+                print('Final validation accuracy: ', stats['val_acc_history'][-1])
+    """
     print('Final training loss: ', stats['loss_history'][-1])
     print('Final validation loss: ', stats['loss_val_history'][-1])
     print('Final validation accuracy: ', stats['val_acc_history'][-1])
