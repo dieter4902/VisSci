@@ -1,10 +1,12 @@
+import copy
+
 import numpy as np
 import matplotlib.pyplot as plt
 import helper
 import os
 import plotly
 
-np.random.seed(1)
+
 
 
 class TwoLayerNeuralNetwork:
@@ -35,6 +37,7 @@ class TwoLayerNeuralNetwork:
         :param std: Skalierungsfaktoren für die Initialisierung (muss klein sein)
         :return:
         """
+        np.random.seed(1)
         self.W1 = std * np.random.randn(input_size, hidden_size)
         self.b1 = std * np.random.randn(1, hidden_size)
         self.W2 = std * np.random.randn(hidden_size, output_size)
@@ -244,6 +247,23 @@ class TwoLayerNeuralNetwork:
         return y_pred
 
 
+def plot_interactible(data):
+    fig = plotly.graph_objs.Figure(data=
+    plotly.graph_objs.Parcoords(
+        line_color='blue',
+        dimensions=list([
+            dict(label='hidden_size', values=data[1:, 0]),
+            dict(label='num_iter', values=data[1:, 1]),
+            dict(label='batch_size', values=data[1:, 2]),
+            dict(label='learning_rate', values=data[1:, 3]),
+            dict(label='learning_rate_decay', values=data[1:, 4]),
+            dict(label='accuracy', values=data[1:, 5])
+        ])
+    ))
+    fig.show()
+    fig.write_html("file{0}.html".format(data.size))
+
+
 if __name__ == '__main__':
     X_train, y_train, X_val, y_val = helper.prepare_CIFAR10_images()
     # Laden der Bilder. Hinweis - wir nutzen nur die Trainigsbilder zum Trainieren und die Validierungsbilder zum Testen
@@ -272,7 +292,7 @@ if __name__ == '__main__':
     batch_size = 300  # Eingabeanzahl der Bilder
     learning_rate = 0.001  # Lernrate
     learning_rate_decay = 0.95  # Lernratenabschwächung
-    """
+
     net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
     stats = net.train(X_train, y_train, X_val, y_val,
                       num_iters=num_iter, batch_size=batch_size,
@@ -286,37 +306,21 @@ if __name__ == '__main__':
     helper.plot_net_weights(net)
     helper.plot_accuracy(stats)
     helper.plot_loss(stats)
-    """
-    data = np.array([[0, 0, 0, 0, 0, 0]])
-    """
-    for lr in range(3000, 4500, 500):
-        learning_rate = ...
-        for ld in range(3000, 4500, 500):
-            learning_rate_decay = ...
-            """
-    for num_iter in range(3000, 4500, 500):
-        for hidden_size in range(50, 300, 50):
-            for batch_size in range(200, 500, 50):
-                net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
-                stats = net.train(X_train, y_train, X_val, y_val,
-                                  num_iters=num_iter, batch_size=batch_size,
-                                  learning_rate=learning_rate, learning_rate_decay=learning_rate_decay,
-                                  verbose=False)
-                print('Final validation accuracy: ', stats['val_acc_history'][-1])
-                data = np.vstack([data, [hidden_size, num_iter, batch_size, learning_rate, learning_rate_decay,
-                                         stats['val_acc_history'][-1]]])
 
-    fig = plotly.graph_objs.Figure(data=
-    plotly.graph_objs.Parcoords(
-        line_color='blue',
-        dimensions=list([
-            dict(label='hidden_size', values=data[1:, 0]),
-            dict(label='num_iter', values=data[1:, 1]),
-            dict(label='batch_size', values=data[1:, 2]),
-            dict(label='learning_rate', values=data[1:, 3]),
-            dict(label='learning_rate_decay', values=data[:, 4]),
-            dict(label='accuracy', values=data[1:, 5])
-        ])
-    )
-    )
-    fig.show()
+    data = np.array([[0, 0, 0, 0, 0, 0]])
+
+    for learning_rate in np.arange(0.0006, 0.0014, 0.0002):
+        for learning_rate_decay in np.arange(0.90, 0.99, 0.01):
+            for num_iter in range(3000, 4500, 500):
+                for hidden_size in range(50, 300, 50):
+                    for batch_size in range(200, 500, 50):
+                        np.random.seed(1)
+                        net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
+                        stats = net.train(X_train, y_train, X_val, y_val,
+                                          num_iters=num_iter, batch_size=batch_size,
+                                          learning_rate=learning_rate, learning_rate_decay=learning_rate_decay,
+                                          verbose=False)
+                        print('Final validation accuracy: ', stats['val_acc_history'][-1])
+                        data = np.vstack([data, [hidden_size, num_iter, batch_size, learning_rate, learning_rate_decay,
+                                                 stats['val_acc_history'][-1]]])
+                plot_interactible(data)
