@@ -7,8 +7,6 @@ import os
 import plotly
 
 
-
-
 class TwoLayerNeuralNetwork:
     """
     Ein 2-Layer 'fully-connected' neural network, d.h. alle Neuronen sind mit allen anderen
@@ -252,12 +250,12 @@ def plot_interactible(data):
     plotly.graph_objs.Parcoords(
         line_color='blue',
         dimensions=list([
-            dict(label='hidden_size', values=data[1:, 0]),
-            dict(label='num_iter', values=data[1:, 1]),
-            dict(label='batch_size', values=data[1:, 2]),
-            dict(label='learning_rate', values=data[1:, 3]),
-            dict(label='learning_rate_decay', values=data[1:, 4]),
-            dict(label='accuracy', values=data[1:, 5])
+            dict(label='hidden_size', values=data[:, 0]),
+            dict(label='num_iter', values=data[:, 1]),
+            dict(label='batch_size', values=data[:, 2]),
+            dict(label='learning_rate', values=data[:, 3]),
+            dict(label='learning_rate_decay', values=data[:, 4]),
+            dict(label='accuracy', values=data[:, 5])
         ])
     ))
     fig.show()
@@ -307,13 +305,14 @@ if __name__ == '__main__':
     helper.plot_accuracy(stats)
     helper.plot_loss(stats)
 
-    data = np.array([[0, 0, 0, 0, 0, 0]])
+    data = np.array(
+        [[hidden_size, num_iter, batch_size, learning_rate, learning_rate_decay, stats['val_acc_history'][-1]]])
 
-    for learning_rate in np.arange(0.0006, 0.0014, 0.0002):
-        for learning_rate_decay in np.arange(0.90, 0.99, 0.01):
+    for learning_rate in np.arange(0.0008, 0.0012, 0.0002):
+        for learning_rate_decay in np.arange(0.93, 0.98, 0.01):
             for num_iter in range(3000, 4500, 500):
-                for hidden_size in range(50, 300, 50):
-                    for batch_size in range(200, 500, 50):
+                for hidden_size in range(100, 300, 50):
+                    for batch_size in range(200, 350, 50):
                         np.random.seed(1)
                         net = TwoLayerNeuralNetwork(input_size, hidden_size, num_classes)  # reset network
                         stats = net.train(X_train, y_train, X_val, y_val,
